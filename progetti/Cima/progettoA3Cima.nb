@@ -1,0 +1,669 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 15.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       154,          7]
+NotebookDataLength[     25357,        661]
+NotebookOptionsPosition[     24084,        634]
+NotebookOutlinePosition[     24485,        650]
+CellTagsIndexPosition[     24442,        647]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{"Progetto", " ", "A3", " ", "Cima", " ", "Matteo"}], "*)"}], 
+  "\[IndentingNewLine]", "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"hexSbox", "=", "\"\<C56B90AD3EF84712\>\""}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{"sbox", "=", 
+     RowBox[{"IntegerDigits", "[", 
+      RowBox[{
+       RowBox[{"FromDigits", "[", 
+        RowBox[{"hexSbox", ",", "16"}], "]"}], ",", "16", ",", "16"}], 
+      "]"}]}], ";"}], "  ", 
+   RowBox[{"(*", 
+    RowBox[{"{", 
+     RowBox[{
+     "12", ",", "5", ",", "6", ",", "11", ",", "9", ",", "0", ",", "10", ",", 
+      "13", ",", "3", ",", "14", ",", "15", ",", "8", ",", "4", ",", "7", ",",
+       "1", ",", "2"}], "}"}], "*)"}], "\n", 
+   RowBox[{
+    RowBox[{"sboxInv", "=", 
+     RowBox[{
+      RowBox[{"Ordering", "[", "sbox", "]"}], "-", "1"}]}], ";"}], 
+   "                            ", 
+   RowBox[{"(*", "inversa", "*)"}], "\[IndentingNewLine]", "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"S", "[", "val_", "]"}], ":=", 
+     RowBox[{"sbox", "[", 
+      RowBox[{"[", 
+       RowBox[{"val", "+", "1"}], "]"}], "]"}]}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"SInv", "[", "val_", "]"}], ":=", 
+     RowBox[{"sboxInv", "[", 
+      RowBox[{"[", 
+       RowBox[{"val", "+", "1"}], "]"}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{
+     RowBox[{"conversioni", " ", "tra", " ", "intero", " ", "64"}], "-", 
+     RowBox[{
+     "bit", " ", "e", " ", "lista", " ", "di", " ", "16", " ", "nibble", " ", 
+      RowBox[{"(", 
+       RowBox[{"LSB", " ", "first"}], ")"}]}]}], "*)"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"toNibbles", "[", "s_Integer", "]"}], ":=", 
+     RowBox[{"Table", "[", 
+      RowBox[{
+       RowBox[{"BitAnd", "[", 
+        RowBox[{
+         RowBox[{"BitShiftRight", "[", 
+          RowBox[{"s", ",", 
+           RowBox[{"4", " ", "k"}]}], "]"}], ",", "15"}], "]"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"k", ",", "0", ",", "15"}], "}"}]}], "]"}]}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"fromNibbles", "[", "nibs_List", "]"}], ":=", 
+     RowBox[{"Total", "[", 
+      RowBox[{"MapIndexed", "[", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"BitShiftLeft", "[", 
+          RowBox[{"#1", ",", 
+           RowBox[{"4", " ", 
+            RowBox[{"(", 
+             RowBox[{
+              RowBox[{"First", "[", "#2", "]"}], "-", "1"}], ")"}]}]}], "]"}],
+          "&"}], ",", "nibs"}], "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+   "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{"sBoxLayer", ":", 
+     RowBox[{"usa", " ", "la", " ", "logica", " ", "vettoriale", " ", 
+      RowBox[{"(", 
+       RowBox[{"converti", "->", 
+        RowBox[{
+         RowBox[{"mappa", " ", "S"}], "->", "ricomponi"}]}], ")"}]}]}], 
+    "*)"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"sBoxLayer", "[", "s_", "]"}], ":=", 
+     RowBox[{"Module", "[", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"nibs", ",", "outNibs"}], "}"}], ",", 
+       RowBox[{
+        RowBox[{"nibs", "=", 
+         RowBox[{"toNibbles", "[", "s", "]"}]}], ";", "\[IndentingNewLine]", 
+        RowBox[{"outNibs", "=", 
+         RowBox[{"S", "/@", "nibs"}]}], ";", "\[IndentingNewLine]", 
+        RowBox[{"fromNibbles", "[", "outNibs", "]"}]}]}], "]"}]}], ";"}], 
+   "\n", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"sBoxLayerInv", "[", "s_", "]"}], ":=", 
+     RowBox[{"Module", "[", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"nibs", ",", "outNibs"}], "}"}], ",", 
+       RowBox[{
+        RowBox[{"nibs", "=", 
+         RowBox[{"toNibbles", "[", "s", "]"}]}], ";", "\[IndentingNewLine]", 
+        RowBox[{"outNibs", "=", 
+         RowBox[{"SInv", "/@", "nibs"}]}], ";", "\[IndentingNewLine]", 
+        RowBox[{"fromNibbles", "[", "outNibs", "]"}]}]}], "]"}]}], ";"}], 
+   "\n", "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{
+    "pLayer", " ", "per", " ", "le", " ", "permutazioni", " ", "di", " ", 
+     "PRESENT"}], "*)"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"pP", "[", "i_", "]"}], ":=", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{"i", "==", "63"}], ",", "63", ",", 
+       RowBox[{"Mod", "[", 
+        RowBox[{
+         RowBox[{"16", " ", "i"}], ",", "63"}], "]"}]}], "]"}]}], ";"}], 
+   "    ", "\n", 
+   RowBox[{
+    RowBox[{"pPinv", "=", 
+     RowBox[{"Association", "[", 
+      RowBox[{"Table", "[", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"pP", "[", "i", "]"}], "->", "i"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"i", ",", "0", ",", "63"}], "}"}]}], "]"}], "]"}]}], ";"}], 
+   "\n", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"pLayer", "[", "s_", "]"}], ":=", 
+     RowBox[{"Module", "[", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"out", "=", "0"}], "}"}], ",", 
+       RowBox[{
+        RowBox[{"Do", "[", 
+         RowBox[{
+          RowBox[{"If", "[", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"BitGet", "[", 
+              RowBox[{"s", ",", "i"}], "]"}], "==", "1"}], ",", 
+            RowBox[{"out", "=", 
+             RowBox[{"BitOr", "[", 
+              RowBox[{"out", ",", 
+               RowBox[{"BitShiftLeft", "[", 
+                RowBox[{"1", ",", 
+                 RowBox[{"pP", "[", "i", "]"}]}], "]"}]}], "]"}]}]}], "]"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"i", ",", "0", ",", "63"}], "}"}]}], "]"}], ";", 
+        "\[IndentingNewLine]", "out"}]}], "]"}]}], ";"}], "\n", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"pLayerInv", "[", "s_", "]"}], ":=", 
+     RowBox[{"Module", "[", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"out", "=", "0"}], "}"}], ",", 
+       RowBox[{
+        RowBox[{"Do", "[", 
+         RowBox[{
+          RowBox[{"If", "[", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"BitGet", "[", 
+              RowBox[{"s", ",", 
+               RowBox[{"pP", "[", "i", "]"}]}], "]"}], "==", "1"}], ",", 
+            RowBox[{"out", "=", 
+             RowBox[{"BitOr", "[", 
+              RowBox[{"out", ",", 
+               RowBox[{"BitShiftLeft", "[", 
+                RowBox[{"1", ",", "i"}], "]"}]}], "]"}]}]}], "]"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"i", ",", "0", ",", "63"}], "}"}]}], "]"}], ";", 
+        "\[IndentingNewLine]", "out"}]}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", "\n", 
+   RowBox[{"(*", 
+    RowBox[{
+     RowBox[{"Key", " ", "schedule"}], ",", " ", 
+     RowBox[{
+      RowBox[{"restituisce", " ", "rounds"}], "+", 
+      RowBox[{"1", " ", "sottochiavi"}]}]}], "*)"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"genRoundKeys", "[", 
+      RowBox[{"key_", ",", "rounds_", ",", 
+       RowBox[{"keysize_", ":", "80"}]}], "]"}], ":=", 
+     RowBox[{"Module", "[", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"keys", "=", 
+          RowBox[{"{", "}"}]}], ",", 
+         RowBox[{"K", "=", "key"}], ",", "top", ",", "top2", ",", "r"}], 
+        "}"}], ",", 
+       RowBox[{
+        RowBox[{"Do", "[", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"AppendTo", "[", 
+            RowBox[{"keys", ",", 
+             RowBox[{"BitShiftRight", "[", 
+              RowBox[{"K", ",", 
+               RowBox[{"keysize", "-", "64"}]}], "]"}]}], "]"}], ";", 
+           RowBox[{"(*", 
+            RowBox[{"i", " ", "64", " ", "bit", " ", 
+             RowBox[{"piu", "'"}], " ", "a", " ", "sinistra"}], "*)"}], 
+           RowBox[{"If", "[", 
+            RowBox[{
+             RowBox[{"keysize", "==", "80"}], ",", 
+             RowBox[{
+              RowBox[{"K", "=", 
+               RowBox[{"BitAnd", "[", 
+                RowBox[{
+                 RowBox[{"BitOr", "[", 
+                  RowBox[{
+                   RowBox[{"BitShiftLeft", "[", 
+                    RowBox[{"K", ",", "61"}], "]"}], ",", 
+                   RowBox[{"BitShiftRight", "[", 
+                    RowBox[{"K", ",", 
+                    RowBox[{"80", "-", "61"}]}], "]"}]}], "]"}], ",", 
+                 RowBox[{
+                  RowBox[{"2", "^", "80"}], "-", "1"}]}], "]"}]}], ";", 
+              "\[IndentingNewLine]", 
+              RowBox[{"top", "=", 
+               RowBox[{"BitAnd", "[", 
+                RowBox[{
+                 RowBox[{"BitShiftRight", "[", 
+                  RowBox[{"K", ",", "76"}], "]"}], ",", "15"}], "]"}]}], ";", 
+              "\[IndentingNewLine]", 
+              RowBox[{"K", "=", 
+               RowBox[{"K", "+", 
+                RowBox[{"BitShiftLeft", "[", 
+                 RowBox[{
+                  RowBox[{
+                   RowBox[{"sbox", "[", 
+                    RowBox[{"[", 
+                    RowBox[{"top", "+", "1"}], "]"}], "]"}], "-", "top"}], ",",
+                   "76"}], "]"}]}]}], ";", 
+              RowBox[{"(*", 
+               RowBox[{"S", "-", 
+                RowBox[{"box", " ", "sul", " ", "nibble", " ", "alto"}]}], 
+               "*)"}], 
+              RowBox[{"K", "=", 
+               RowBox[{"BitXor", "[", 
+                RowBox[{"K", ",", 
+                 RowBox[{"BitShiftLeft", "[", 
+                  RowBox[{"r", ",", "15"}], "]"}]}], "]"}]}]}], ",", 
+             RowBox[{"(*", 
+              RowBox[{"XOR", " ", "contatore", " ", "di", " ", "round"}], 
+              "*)"}], 
+             RowBox[{"(*", 
+              RowBox[{"keysize", "==", "128"}], "*)"}], 
+             RowBox[{
+              RowBox[{"K", "=", 
+               RowBox[{"BitAnd", "[", 
+                RowBox[{
+                 RowBox[{"BitOr", "[", 
+                  RowBox[{
+                   RowBox[{"BitShiftLeft", "[", 
+                    RowBox[{"K", ",", "61"}], "]"}], ",", 
+                   RowBox[{"BitShiftRight", "[", 
+                    RowBox[{"K", ",", 
+                    RowBox[{"128", "-", "61"}]}], "]"}]}], "]"}], ",", 
+                 RowBox[{
+                  RowBox[{"2", "^", "128"}], "-", "1"}]}], "]"}]}], ";", 
+              "\[IndentingNewLine]", 
+              RowBox[{"top", "=", 
+               RowBox[{"BitAnd", "[", 
+                RowBox[{
+                 RowBox[{"BitShiftRight", "[", 
+                  RowBox[{"K", ",", "124"}], "]"}], ",", "15"}], "]"}]}], ";",
+               "\[IndentingNewLine]", 
+              RowBox[{"K", "=", 
+               RowBox[{"K", "+", 
+                RowBox[{"BitShiftLeft", "[", 
+                 RowBox[{
+                  RowBox[{
+                   RowBox[{"sbox", "[", 
+                    RowBox[{"[", 
+                    RowBox[{"top", "+", "1"}], "]"}], "]"}], "-", "top"}], ",",
+                   "124"}], "]"}]}]}], ";", "\[IndentingNewLine]", 
+              RowBox[{"top2", "=", 
+               RowBox[{"BitAnd", "[", 
+                RowBox[{
+                 RowBox[{"BitShiftRight", "[", 
+                  RowBox[{"K", ",", "120"}], "]"}], ",", "15"}], "]"}]}], ";",
+               "\[IndentingNewLine]", 
+              RowBox[{"K", "=", 
+               RowBox[{"K", "+", 
+                RowBox[{"BitShiftLeft", "[", 
+                 RowBox[{
+                  RowBox[{
+                   RowBox[{"sbox", "[", 
+                    RowBox[{"[", 
+                    RowBox[{"top2", "+", "1"}], "]"}], "]"}], "-", "top2"}], ",",
+                   "120"}], "]"}]}]}], ";", "\[IndentingNewLine]", 
+              RowBox[{"K", "=", 
+               RowBox[{"BitXor", "[", 
+                RowBox[{"K", ",", 
+                 RowBox[{"BitShiftLeft", "[", 
+                  RowBox[{"r", ",", "62"}], "]"}]}], "]"}]}]}]}], "]"}]}], ",", 
+          RowBox[{"{", 
+           RowBox[{"r", ",", "1", ",", 
+            RowBox[{"rounds", "+", "1"}]}], "}"}]}], "]"}], ";", 
+        "\[IndentingNewLine]", "keys"}]}], "]"}]}], ";"}], "\n", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"encrypt", "[", 
+      RowBox[{"pt_", ",", "key_", ",", 
+       RowBox[{"rounds_", ":", "31"}], ",", 
+       RowBox[{"keysize_", ":", "80"}]}], "]"}], ":=", 
+     RowBox[{"Module", "[", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"rk", ",", 
+         RowBox[{"s", "=", "pt"}]}], "}"}], ",", 
+       RowBox[{
+        RowBox[{"rk", "=", 
+         RowBox[{"genRoundKeys", "[", 
+          RowBox[{"key", ",", "rounds", ",", "keysize"}], "]"}]}], ";", 
+        "\[IndentingNewLine]", 
+        RowBox[{"Do", "[", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"s", "=", 
+            RowBox[{"BitXor", "[", 
+             RowBox[{"s", ",", 
+              RowBox[{"rk", "[", 
+               RowBox[{"[", "i", "]"}], "]"}]}], "]"}]}], ";", 
+           "\[IndentingNewLine]", 
+           RowBox[{"s", "=", 
+            RowBox[{"sBoxLayer", "[", "s", "]"}]}], ";", 
+           "\[IndentingNewLine]", 
+           RowBox[{"s", "=", 
+            RowBox[{"pLayer", "[", "s", "]"}]}]}], ",", 
+          RowBox[{"{", 
+           RowBox[{"i", ",", "1", ",", "rounds"}], "}"}]}], "]"}], ";", 
+        "\[IndentingNewLine]", 
+        RowBox[{"BitXor", "[", 
+         RowBox[{"s", ",", 
+          RowBox[{"rk", "[", 
+           RowBox[{"[", 
+            RowBox[{"rounds", "+", "1"}], "]"}], "]"}]}], "]"}]}]}], "]"}]}], 
+    ";"}], "\n", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"decrypt", "[", 
+      RowBox[{"ct_", ",", "key_", ",", 
+       RowBox[{"rounds_", ":", "31"}], ",", 
+       RowBox[{"keysize_", ":", "80"}]}], "]"}], ":=", 
+     RowBox[{"Module", "[", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"rk", ",", 
+         RowBox[{"s", "=", "ct"}]}], "}"}], ",", 
+       RowBox[{
+        RowBox[{"rk", "=", 
+         RowBox[{"genRoundKeys", "[", 
+          RowBox[{"key", ",", "rounds", ",", "keysize"}], "]"}]}], ";", 
+        "\[IndentingNewLine]", 
+        RowBox[{"s", "=", 
+         RowBox[{"BitXor", "[", 
+          RowBox[{"s", ",", 
+           RowBox[{"rk", "[", 
+            RowBox[{"[", 
+             RowBox[{"rounds", "+", "1"}], "]"}], "]"}]}], "]"}]}], ";", 
+        "\[IndentingNewLine]", 
+        RowBox[{"Do", "[", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"s", "=", 
+            RowBox[{"pLayerInv", "[", "s", "]"}]}], ";", 
+           "\[IndentingNewLine]", 
+           RowBox[{"s", "=", 
+            RowBox[{"sBoxLayerInv", "[", "s", "]"}]}], ";", 
+           "\[IndentingNewLine]", 
+           RowBox[{"s", "=", 
+            RowBox[{"BitXor", "[", 
+             RowBox[{"s", ",", 
+              RowBox[{"rk", "[", 
+               RowBox[{"[", "i", "]"}], "]"}]}], "]"}]}]}], ",", 
+          RowBox[{"{", 
+           RowBox[{"i", ",", "rounds", ",", "1", ",", 
+            RowBox[{"-", "1"}]}], "}"}]}], "]"}], ";", "\[IndentingNewLine]", 
+        "s"}]}], "]"}]}], ";"}], "\[IndentingNewLine]", "\[IndentingNewLine]",
+    "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{"TEST", " ", "VECTORS", " ", "UFFICIALI"}], "*)"}], "\n", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"testVectors", "[", "]"}], ":=", 
+     RowBox[{"Module", "[", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"v80", ",", "v128", ",", "ok"}], "}"}], ",", 
+       RowBox[{
+        RowBox[{"v80", "=", 
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{
+            "16^^0000000000000000", ",", "16^^00000000000000000000", ",", 
+             "16^^5579C1387B228445"}], "}"}], ",", 
+           RowBox[{"{", 
+            RowBox[{
+            "16^^FFFFFFFFFFFFFFFF", ",", "16^^00000000000000000000", ",", 
+             "16^^A112FFC72F68417B"}], "}"}], ",", 
+           RowBox[{"{", 
+            RowBox[{
+            "16^^0000000000000000", ",", "16^^FFFFFFFFFFFFFFFFFFFF", ",", 
+             "16^^E72C46C0F5945049"}], "}"}], ",", 
+           RowBox[{"{", 
+            RowBox[{
+            "16^^FFFFFFFFFFFFFFFF", ",", "16^^FFFFFFFFFFFFFFFFFFFF", ",", 
+             "16^^3333DCD3213210D2"}], "}"}]}], "}"}]}], ";", 
+        "\[IndentingNewLine]", 
+        RowBox[{"v128", "=", 
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{
+            "16^^0000000000000000", ",", "0", ",", "16^^96DB702A2E6900AF"}], 
+            "}"}], ",", 
+           RowBox[{"{", 
+            RowBox[{"16^^0000000000000000", ",", 
+             RowBox[{
+              RowBox[{"2", "^", "128"}], "-", "1"}], ",", 
+             "16^^13238C710272A5D8"}], "}"}]}], "}"}]}], ";", 
+        "\[IndentingNewLine]", 
+        RowBox[{"Print", "[", "\"\<PRESENT-80 (cifra 31 round):\>\"", "]"}], ";",
+         "\[IndentingNewLine]", 
+        RowBox[{"Do", "[", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"ok", "=", 
+            RowBox[{
+             RowBox[{
+              RowBox[{"encrypt", "[", 
+               RowBox[{
+                RowBox[{"v", "[", 
+                 RowBox[{"[", "1", "]"}], "]"}], ",", 
+                RowBox[{"v", "[", 
+                 RowBox[{"[", "2", "]"}], "]"}], ",", "31", ",", "80"}], 
+               "]"}], "==", 
+              RowBox[{"v", "[", 
+               RowBox[{"[", "3", "]"}], "]"}]}], "&&", 
+             RowBox[{
+              RowBox[{"decrypt", "[", 
+               RowBox[{
+                RowBox[{"v", "[", 
+                 RowBox[{"[", "3", "]"}], "]"}], ",", 
+                RowBox[{"v", "[", 
+                 RowBox[{"[", "2", "]"}], "]"}], ",", "31", ",", "80"}], 
+               "]"}], "==", 
+              RowBox[{"v", "[", 
+               RowBox[{"[", "1", "]"}], "]"}]}]}]}], ";", 
+           "\[IndentingNewLine]", 
+           RowBox[{"Print", "[", 
+            RowBox[{"\"\<  PT=\>\"", ",", 
+             RowBox[{"IntegerString", "[", 
+              RowBox[{
+               RowBox[{"v", "[", 
+                RowBox[{"[", "1", "]"}], "]"}], ",", "16", ",", "16"}], "]"}],
+              ",", "\"\< -> C ok? \>\"", ",", "ok"}], "]"}]}], ",", 
+          RowBox[{"{", 
+           RowBox[{"v", ",", "v80"}], "}"}]}], "]"}], ";", 
+        "\[IndentingNewLine]", 
+        RowBox[{"Print", "[", "\"\<PRESENT-128 (cifra 31 round):\>\"", "]"}], 
+        ";", "\[IndentingNewLine]", 
+        RowBox[{"Do", "[", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"ok", "=", 
+            RowBox[{
+             RowBox[{"encrypt", "[", 
+              RowBox[{
+               RowBox[{"v", "[", 
+                RowBox[{"[", "1", "]"}], "]"}], ",", 
+               RowBox[{"v", "[", 
+                RowBox[{"[", "2", "]"}], "]"}], ",", "31", ",", "128"}], 
+              "]"}], "==", 
+             RowBox[{"v", "[", 
+              RowBox[{"[", "3", "]"}], "]"}]}]}], ";", "\[IndentingNewLine]", 
+           RowBox[{"Print", "[", 
+            RowBox[{"\"\<  PT=\>\"", ",", 
+             RowBox[{"IntegerString", "[", 
+              RowBox[{
+               RowBox[{"v", "[", 
+                RowBox[{"[", "1", "]"}], "]"}], ",", "16", ",", "16"}], "]"}],
+              ",", "\"\< -> C ok? \>\"", ",", "ok"}], "]"}]}], ",", 
+          RowBox[{"{", 
+           RowBox[{"v", ",", "v128"}], "}"}]}], "]"}], ";"}]}], "]"}]}], 
+    ";"}], "\[IndentingNewLine]", "\n", 
+   RowBox[{"(*", 
+    RowBox[{"DRIVER", ":", 
+     RowBox[{
+     "esegue", " ", "e", " ", "stampa", " ", "tutte", " ", "le", " ", 
+      "verifiche", " ", "sperimentali"}]}], "*)"}], "\[IndentingNewLine]", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"runAll", "[", "]"}], ":=", 
+     RowBox[{"Module", "[", 
+      RowBox[{
+       RowBox[{"{", "}"}], ",", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"Print", "[", "\"\< Prova dei vettori ufficiali: \>\"", "]"}],
+         ";", "\[IndentingNewLine]", 
+        RowBox[{"testVectors", "[", "]"}]}]}], "]"}]}], ";"}], "\n", 
+   "\[IndentingNewLine]", 
+   RowBox[{"runAll", "[", "]"}], "\n"}]}]], "Input",
+ CellChangeTimes->{{3.9986204742879066`*^9, 3.9986204742879066`*^9}, {
+  3.9986207239914455`*^9, 3.9986207737211094`*^9}, {3.998620863119198*^9, 
+  3.9986208903392296`*^9}, {3.998620976340313*^9, 3.998621029289852*^9}, {
+  3.9986210599699802`*^9, 3.9986211373804092`*^9}},
+ CellLabel->"In[1]:=",ExpressionUUID->"da80d6bc-e54f-344e-837d-6412e863bc42"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData["\<\" Prova dei vettori ufficiali: \"\>"], "Print",
+ CellChangeTimes->{3.9986205056178265`*^9, 3.998621151464489*^9},
+ CellLabel->
+  "During evaluation of \
+In[1]:=",ExpressionUUID->"5c21e55f-47ea-8f47-a8cf-31a2925b2441"],
+
+Cell[BoxData["\<\"PRESENT-80 (cifra 31 round):\"\>"], "Print",
+ CellChangeTimes->{3.9986205056178265`*^9, 3.998621151467531*^9},
+ CellLabel->
+  "During evaluation of \
+In[1]:=",ExpressionUUID->"bfaa3c13-ac98-9d45-9760-548f48781743"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  PT=\"\>", "\[InvisibleSpace]", "\<\"0000000000000000\"\>", 
+   "\[InvisibleSpace]", "\<\" -> C ok? \"\>", "\[InvisibleSpace]", "True"}],
+  SequenceForm["  PT=", "0000000000000000", " -> C ok? ", True],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.9986205056178265`*^9, 3.9986211515101757`*^9},
+ CellLabel->
+  "During evaluation of \
+In[1]:=",ExpressionUUID->"8ccdfd00-7605-e54b-8e60-7c01e66b5bfe"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  PT=\"\>", "\[InvisibleSpace]", "\<\"ffffffffffffffff\"\>", 
+   "\[InvisibleSpace]", "\<\" -> C ok? \"\>", "\[InvisibleSpace]", "True"}],
+  SequenceForm["  PT=", "ffffffffffffffff", " -> C ok? ", True],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.9986205056178265`*^9, 3.9986211515162888`*^9},
+ CellLabel->
+  "During evaluation of \
+In[1]:=",ExpressionUUID->"69aff58b-2f96-9e41-b1fc-3f375d5a33b5"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  PT=\"\>", "\[InvisibleSpace]", "\<\"0000000000000000\"\>", 
+   "\[InvisibleSpace]", "\<\" -> C ok? \"\>", "\[InvisibleSpace]", "True"}],
+  SequenceForm["  PT=", "0000000000000000", " -> C ok? ", True],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.9986205056178265`*^9, 3.9986211515203934`*^9},
+ CellLabel->
+  "During evaluation of \
+In[1]:=",ExpressionUUID->"638865c5-3d1c-aa41-b4dd-2c4a4e219bef"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  PT=\"\>", "\[InvisibleSpace]", "\<\"ffffffffffffffff\"\>", 
+   "\[InvisibleSpace]", "\<\" -> C ok? \"\>", "\[InvisibleSpace]", "True"}],
+  SequenceForm["  PT=", "ffffffffffffffff", " -> C ok? ", True],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.9986205056178265`*^9, 3.998621151560459*^9},
+ CellLabel->
+  "During evaluation of \
+In[1]:=",ExpressionUUID->"64e54afe-17d0-7e4d-8884-31714da015fb"],
+
+Cell[BoxData["\<\"PRESENT-128 (cifra 31 round):\"\>"], "Print",
+ CellChangeTimes->{3.9986205056178265`*^9, 3.9986211515639935`*^9},
+ CellLabel->
+  "During evaluation of \
+In[1]:=",ExpressionUUID->"27cdc4a6-7e31-2448-a6d2-8675bf5c7ff8"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  PT=\"\>", "\[InvisibleSpace]", "\<\"0000000000000000\"\>", 
+   "\[InvisibleSpace]", "\<\" -> C ok? \"\>", "\[InvisibleSpace]", "True"}],
+  SequenceForm["  PT=", "0000000000000000", " -> C ok? ", True],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.9986205056178265`*^9, 3.998621151570404*^9},
+ CellLabel->
+  "During evaluation of \
+In[1]:=",ExpressionUUID->"be76dddc-6ea0-6e4a-90e9-fe671b3c8f21"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  PT=\"\>", "\[InvisibleSpace]", "\<\"0000000000000000\"\>", 
+   "\[InvisibleSpace]", "\<\" -> C ok? \"\>", "\[InvisibleSpace]", "True"}],
+  SequenceForm["  PT=", "0000000000000000", " -> C ok? ", True],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.9986205056178265`*^9, 3.998621151570404*^9},
+ CellLabel->
+  "During evaluation of \
+In[1]:=",ExpressionUUID->"659ac4ff-91d1-4745-8057-194c992d77a4"]
+}, Open  ]]
+}, Open  ]]
+},
+WindowSize->{1440, 741.75},
+WindowMargins->{{-6, Automatic}, {Automatic, -6}},
+FrontEndVersion->"15.0 for Microsoft Windows (64-bit) (July 2, 2026)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"a1437042-28d0-2f47-bac3-edf46dc85862"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[576, 22, 20012, 522, 1531, "Input",ExpressionUUID->"da80d6bc-e54f-344e-837d-6412e863bc42"],
+Cell[CellGroupData[{
+Cell[20613, 548, 234, 4, 22, "Print",ExpressionUUID->"5c21e55f-47ea-8f47-a8cf-31a2925b2441"],
+Cell[20850, 554, 232, 4, 22, "Print",ExpressionUUID->"bfaa3c13-ac98-9d45-9760-548f48781743"],
+Cell[21085, 560, 454, 9, 22, "Print",ExpressionUUID->"8ccdfd00-7605-e54b-8e60-7c01e66b5bfe"],
+Cell[21542, 571, 454, 9, 22, "Print",ExpressionUUID->"69aff58b-2f96-9e41-b1fc-3f375d5a33b5"],
+Cell[21999, 582, 454, 9, 22, "Print",ExpressionUUID->"638865c5-3d1c-aa41-b4dd-2c4a4e219bef"],
+Cell[22456, 593, 452, 9, 22, "Print",ExpressionUUID->"64e54afe-17d0-7e4d-8884-31714da015fb"],
+Cell[22911, 604, 235, 4, 22, "Print",ExpressionUUID->"27cdc4a6-7e31-2448-a6d2-8675bf5c7ff8"],
+Cell[23149, 610, 452, 9, 22, "Print",ExpressionUUID->"be76dddc-6ea0-6e4a-90e9-fe671b3c8f21"],
+Cell[23604, 621, 452, 9, 22, "Print",ExpressionUUID->"659ac4ff-91d1-4745-8057-194c992d77a4"]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
